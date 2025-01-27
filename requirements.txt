@@ -1,0 +1,6 @@
+openai
+tiktoken
+python-dotenv
+azure-search-documents==11.4.0b8
+azure-identity==1.13.0b4
+langchain
