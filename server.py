@@ -1,11 +1,11 @@
 import os
-from dotenv import load_dotenv
-load_dotenv()
-
+import dotenv
+dotenv.load_dotenv()
 from fastapi import FastAPI
 from utils import txtToDocs, chatExecute, chatHistoryToList
 from VectoreStores.azure import azureAddDocuments, azureSearch, azureLoad
 import traceback
+
 
 app = FastAPI()
 
@@ -22,8 +22,8 @@ def search(parameters: dict):
 
     if "doc_num" in parameters:
         k = int(parameters["doc_num"])
-    else:
-        k = os.environ['DOCUMENT_NUM']
+    # else:
+    #     k = os.environ['DOCUMENT_NUM']
     
     filters = {}
 
@@ -65,8 +65,8 @@ async def add_bot_message(conversation_history: dict):
         
         if "doc_num" in conversation_history:
             search_kwards['k'] = conversation_history['doc_num']
-        else:
-            search_kwards['k'] = os.environ['DOCUMENT_NUM']
+        # else:
+        #     search_kwards['k'] = os.environ['DOCUMENT_NUM']
         
         if 'search_type' in conversation_history:
             search_kwards['search_type'] = conversation_history['search_type']
@@ -75,8 +75,8 @@ async def add_bot_message(conversation_history: dict):
         
         (answer, res_chat_history, res_metadata) = chatExecute(
             query, 
-            vectore_stores=azureLoad(),
-            search_kawrds=search_kwards,
+            vectore_store=azureLoad(),
+            search_kwards=search_kwards,
             chat_history=chat_history
         )
 
