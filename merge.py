@@ -15,30 +15,30 @@ from azure.search.documents.indexes.models import (
     SearchFieldDataType,
     SimpleField
 )
-from azure.core.credentials import AzureKeyCredential
-from azure.ai.documentanalysis import DocumentAnalysisClient
+# from azure.core.credentials import AzureKeyCredential
+# from azure.ai.documentanalysis import DocumentAnalysisClient
 
-document_analysis_client = DocumentAnalysisClient(
-    endpoint="YOUR_FORM_RECOGNIZER_ENDPOINT",
-    credential=AzureKeyCredential("YOUR_FORM_RECOGNIZER_KEY")
-)
+# document_analysis_client = DocumentAnalysisClient(
+#     endpoint="YOUR_FORM_RECOGNIZER_ENDPOINT",
+#     credential=AzureKeyCredential("YOUR_FORM_RECOGNIZER_KEY")
+# )
 
-with open("rouki_text.pdf", "rb") as f:
-    poller = document_analysis_client.begin_analyze_document("prebuilt-document", f)
-result = poller.result()
+# with open("rouki_text.pdf", "rb") as f:
+#     poller = document_analysis_client.begin_analyze_document("prebuilt-document", f)
+# result = poller.result()
 
-for i, page in enumerate(result.pages):
-    text_lines = [line.content for line in page.lines]
-    page_text = "\n".join(text_lines)
-    print(f"--- page {i+1} ---")
-    print(page_text)
+# for i, page in enumerate(result.pages):
+#     text_lines = [line.content for line in page.lines]
+#     page_text = "\n".join(text_lines)
+#     print(f"--- page {i+1} ---")
+#     print(page_text)
 
 # # 環境変数をロード
 # load_dotenv()
 
 loader = PyPDFLoader(
     # file_path = "./sample.pdf",
-    file_path = "./rouki_text.pdf",
+    file_path = "./jdla.pdf",
     extract_images = True
     )
 
