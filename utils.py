@@ -8,8 +8,13 @@ from langchain_openai import AzureChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.vectorstores.azuresearch import AzureSearch
 
+#################################################
+# 文章とメタデータを受け取り、Documentのリストを返す
+#################################################
+
 
 def txtToDocs(content:str, metadata:dict):
+    # ドキュメントのリストを作成
     docs = [Document(page_content=content, metadata=metadata)]
     chunk_size =300
     separator="\n"
@@ -21,21 +26,30 @@ def txtToDocs(content:str, metadata:dict):
         length_function=len,
         is_separator_regex=False
         )
+    
+    # ドキュメントのリストを設定したパラメータで分割
     splitted_docs = text_splitter.split_documents(docs)
     return splitted_docs
 
+######################
+# チャットボットの実行
+######################
+
 def chatExecute(
-        query:str,
+        query:str,# ユーザーの質問
         vectore_store: AzureSearch,
         chat_history:list[tuple]=[],
         search_type="similarity",
         search_kwards={}
         ):
+    
+    # ベクターストアから検索結果を取得するためのインスタンスを作成
     retriver = vectore_store.as_retriever(
         search_type=search_type,
         search_kwards=search_kwards
     )
 
+    # LLMのインスタンスを作成
     chat = AzureChatOpenAI(
         azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
         api_version="2024-05-01-preview",
@@ -44,19 +58,27 @@ def chatExecute(
         temperature=0
         )
     
+    # チャットボットのインスタンスを作成
     qa = ConversationalRetrievalChain.from_llm(
         llm=chat,
         retriever = retriver,
         return_source_documents=True,
         chain_type="stuff"
         )
-
+    
+    # チャットボットの実行
     result = qa({'question': query, "chat_history": chat_history})
+    # チャットボットの回答
     answer = result['answer']
+    # チャットボットの回答に対応するメタデータのリスト
     metadatas = [doc.metadata for doc in result['source_documents']]
-
+    # 会話履歴に追加
     chat_history.append((query, result['answer']))
     return (answer, chat_history, metadatas)
+
+###########################
+# chat_historyをリストに変換
+###########################
 
 def chatHistoryToList(chat_history:list[dict]) -> list[tuple]:
     chat_history_list = []

@@ -6,20 +6,23 @@ from utils import txtToDocs, chatExecute, chatHistoryToList
 from VectoreStores.azure import azureAddDocuments, azureSearch, azureLoad
 import traceback
 
-
 app = FastAPI()
 
-@app.post("/add_document")
+
+@app.post("/add_document", description="ベクターストアへのドキュメント追加")
 def add_document(parameters: dict):
     content = parameters["content"]
     metadata = parameters["metadata"]
     docs = txtToDocs(content, metadata)
     return azureAddDocuments(documents=docs)
 
-@app.post("/doc_search",description="ベクターストアへのベクトル検索")
+
+@app.post("/doc_search", description="ベクターストアへのベクトル検索")
 def search(parameters: dict):
+    # 検索クエリ
     query = parameters["query"]
 
+    # 取得するドキュメント数
     if "doc_num" in parameters:
         k = int(parameters["doc_num"])
     # else:
@@ -27,11 +30,13 @@ def search(parameters: dict):
     
     filters = {}
 
+    # フィルタリングするmetadataの取得
     if "filters" in parameters:
         filters = parameters["filters"]
     else:
         filters = None
 
+    # 検索タイプの取得("similarity", "hybrid", "semantic_hybrid"のいずれか)
     search_type = "hybrid"
     if "search_type" in parameters:
         search_type = parameters["search_type"]
@@ -39,7 +44,7 @@ def search(parameters: dict):
     return azureSearch(query=query, k=k, filters=filters, search_type=search_type)
 
 
-@app.post("/conversation_history",description="こんにちは")
+@app.post("/conversation_history", description="会話履歴")
 async def add_bot_message(conversation_history: dict):
     try:
         chat_history = conversation_history["messages"]
